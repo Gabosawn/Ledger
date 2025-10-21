@@ -1,0 +1,5 @@
+id_transaccion;timestamp;moneda_origen;moneda_destino;monto;cuenta_origen;cuenta_destino;tipo
+66;2025-10-19 16:23:41;USD;;100;Gabriel;;alta_cuenta
+68;2025-10-19 16:23:41;EUR;;0;Gabriel;;alta_cuenta
+69;2025-10-19 16:23:41;USD;EUR;50;Gabriel;;swap
+71;2025-10-19 16:23:41;USD;;25;Gabriel;Alejandro;transferencia

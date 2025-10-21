@@ -1,34 +1,57 @@
 defmodule CSVManagerTest do
-    alias Estructuras.Moneda, as: Moneda
-    alias Estructuras.Balance, as: Balance
-    alias Estructuras.Argumentos, as: Argumentos
-    alias Estructuras.Transaccion, as: Transaccion
-    use ExUnit.Case
-    doctest CSVManager
+  use ExUnit.Case
 
-    test "Se lee el un archivo mal hecho de transaccion" do
-        res = CSVManager.readFileCSV("test/transaccionesMal.csv", Transaccion, true)
-        
-        assert res == {:error, 5}
-    end
-    test "Se lee el un archivo mal hecho de monedas" do
-        res = CSVManager.readFileCSV("test/monedasMal.csv", Moneda, true)
-        
-        assert res == {:error, 3}
-    end
+  alias Estructuras.{Moneda, Transaccion}
+  alias CSVManager
 
-    test "Se escribe un archivo balance con 6 decimales" do
-        Ledger.initOperation(%Argumentos{cuenta_origen: "userA", archivo_output: "pruebaDecimales.csv"}, "balance")
-        res = CSVManager.readFileCSV("responsesFIles/pruebaDecimales.csv", Balance, false)
-        |> Enum.map(fn balance ->
-            map = Map.from_struct(balance)
-            [_, x] = String.split(map[:BALANCE], ".")
-            x
-        end)|> Enum.all?(fn balance -> 
-            String.length(balance) == 6
-        end)
+  @input_ok "data/"
+  @test_dir "test/data/"
 
-        assert res
-    end
+
+  test "Se lee un archivo bien escrito moneda" do
+    res = CSVManager.readFileCSV(@input_ok <> "monedas.csv", Moneda, true)
+
+    assert is_list(res)
+  end
+
+  test "Se lee un archivo mal escrito moneda" do
+    res = CSVManager.readFileCSV(@test_dir <> "monedasMal.csv", Moneda, true)
+
+    assert res == {:error, 3}
+  end
+
+  test "Se lee un archivo bien escrito transaccion" do
+    res = CSVManager.readFileCSV(@input_ok <> "transacciones.csv", Transaccion, true)
+
+    assert is_list(res)
+  end
+
+  test "Se lee un archivo mal escrito transaccion" do
+    res = CSVManager.readFileCSV(@test_dir <> "transaccionesMal.csv", Transaccion, true)
+
+    assert res == {:error, 5}
+  end
+
+  test "Se escribe un archivo punto y coma" do
+    data = CSVManager.readFileCSV(@input_ok <> "monedas.csv", Moneda, true)
+
+    res = CSVManager.writeFileCSV("testRes.csv", data, Moneda, true)
+
+    assert res == {:ok, "Operación realizada con exito"}
+  end
+
+  test "Se escribe un archivo igual" do
+    data = CSVManager.readFileCSV(@input_ok <> "monedas.csv", Moneda, true)
+
+    res = CSVManager.writeFileCSV("testRes.csv", data, Moneda, false)
+
+    assert res == {:ok, "Operación realizada con exito"}
+  end
+
+  test "Se lee un archivo moneda con = como separador" do
+    res = CSVManager.readFileCSV(@test_dir <> "monedasIgual.csv", Moneda, false)
+
+    assert is_list(res)
+  end
 
 end
