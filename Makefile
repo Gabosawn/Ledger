@@ -13,19 +13,18 @@ endif
 
 test:
 ifeq ($(OS),Windows_NT)
-	powershell -Command "$$env:MIX_ENV='test'; mix ecto.rollback --all"
-	powershell -Command "$$env:MIX_ENV='test'; mix ecto.migrate"
 	powershell -Command "$$env:MIX_ENV='test'; mix test --cover"
 else
-	MIX_ENV=test mix ecto.rollback --all
-	MIX_ENV=test mix ecto.migrate
 	MIX_ENV=test mix test --cover
 endif
 
-reload:
-	mix deps.get
-	mix ecto.rollback --all
-	mix ecto.migrate
+reload_all:
+	MIX_ENV=dev mix deps.get
+	MIX_ENV=dev mix ecto.rollback --all
+	MIX_ENV=dev mix ecto.migrate
+	MIX_ENV=test mix deps.get
+	MIX_ENV=test mix ecto.rollback --all
+	MIX_ENV=test mix ecto.migrate
 ifeq ($(OS),Windows_NT)
 	powershell -Command "$$env:MIX_ENV='dev'; mix escript.build"
 else
@@ -53,5 +52,7 @@ ifeq ($(OS),Windows_NT)
 else
 	MIX_ENV=dev mix escript.build
 endif
-	mix ecto.create
-	mix ecto.migrate
+	MIX_ENV=test mix ecto.create
+	MIX_ENV=test mix ecto.migrate
+	MIX_ENV=dev mix ecto.create
+	MIX_ENV=dev mix ecto.migrate
